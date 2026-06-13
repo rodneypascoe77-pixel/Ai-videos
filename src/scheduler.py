@@ -20,6 +20,7 @@ from db.init import init_db
 from db.logging import get_logger
 from discovery import run_cycle
 from generation.runner import run as run_script_generation
+from video.runner import run as run_video_generation
 
 log = get_logger("scheduler")
 
@@ -52,6 +53,18 @@ def build_scheduler() -> BlockingScheduler:
         max_instances=1,
         coalesce=True,
         next_run_time=now + timedelta(minutes=5),
+    )
+    # Phase 3: generate videos for queued trends' selected scripts. Offset further
+    # so scripts exist first. In live mode this spends money — keep it conservative.
+    scheduler.add_job(
+        run_video_generation,
+        trigger="interval",
+        hours=interval,
+        id="video_generation",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        next_run_time=now + timedelta(minutes=10),
     )
     return scheduler
 

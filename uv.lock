@@ -21,6 +21,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "python-dotenv" },
     { name = "pytrends" },
+    { name = "runwayml" },
     { name = "sqlalchemy" },
     { name = "tenacity" },
 ]
@@ -41,6 +42,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "pytrends", specifier = ">=4.9.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
+    { name = "runwayml", specifier = ">=3.0.0" },
     { name = "sqlalchemy", specifier = ">=2.0.0" },
     { name = "tenacity", specifier = ">=8.2.0" },
 ]
@@ -906,6 +908,23 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/49/71/9b29d6b87cef468d697f43c6a91e3fae4a80185779d7d5a4ef27d173439f/ruff-0.15.17-py3-none-win32.whl", hash = "sha256:596065960ab1ff593f744220c9fe6580eda00a95003cffa9f4048bb5b1bf0392", size = 10925574, upload-time = "2026-06-11T17:54:55.723Z" },
     { url = "https://files.pythonhosted.org/packages/3d/b2/8fc77f3723228836fa5d12497eb71c808f83782e10d058d2b15cfa14640b/ruff-0.15.17-py3-none-win_amd64.whl", hash = "sha256:6769e5fa1710b179b92e0bfa5a51735b35baea9013dadb06d5f44cbcf9547084", size = 12058788, upload-time = "2026-06-11T17:54:41.042Z" },
     { url = "https://files.pythonhosted.org/packages/2d/c7/c53e8dbff9c9dc4b7928773421ae294a5d28fcb8dcda1a089579d3a7e510/ruff-0.15.17-py3-none-win_arm64.whl", hash = "sha256:f3be1fbb34bcdfd146240d8fb92a709d4c2c8191348580a3c044ec60fa0b4456", size = 11355275, upload-time = "2026-06-11T17:54:43.635Z" },
+]
+
+[[package]]
+name = "runwayml"
+version = "5.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "distro" },
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f7/d4/7965d010d36d6d82c2007462ef197cf378926add7b6831b6506016625922/runwayml-5.1.0.tar.gz", hash = "sha256:dc67a12b252a8188dff87d05d48954867c81904870573cf13450e2984ec3cdaa", size = 285966, upload-time = "2026-06-12T19:35:44.436Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/ae/aaa105d1d192d66c32def1c065282f6cd6aad9c200cfe669203c3d8bb922/runwayml-5.1.0-py3-none-any.whl", hash = "sha256:409ce77c30e482f786ded4dc0226f98962f35ca8268057c51f5f4b2510595504", size = 194281, upload-time = "2026-06-12T19:35:43.094Z" },
 ]
 
 [[package]]

@@ -61,6 +61,13 @@ class ScriptStatus(str, enum.Enum):
     used = "used"            # a video was produced from it
 
 
+class VideoStatus(str, enum.Enum):
+    pending = "pending"        # row created, not yet submitted to the provider
+    generating = "generating"  # submitted, provider job running
+    completed = "completed"    # video produced, URL available
+    failed = "failed"          # provider job failed
+
+
 class LogLevel(str, enum.Enum):
     debug = "debug"
     info = "info"
@@ -179,6 +186,43 @@ class Script(Base):
     )
 
     trend: Mapped["Trend"] = relationship("Trend", back_populates="scripts")
+    videos: Mapped[list["Video"]] = relationship(
+        "Video", back_populates="script", cascade="all, delete-orphan"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Video — a generated video for a Script (Phase 3)
+# ---------------------------------------------------------------------------
+
+
+class Video(Base):
+    """A video produced from a selected script via a video-generation provider."""
+
+    __tablename__ = "videos"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    script_id: Mapped[int] = mapped_column(
+        ForeignKey("scripts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    provider: Mapped[str] = mapped_column(String(32), nullable=False)  # "runway" / "stub"
+    prompt_text: Mapped[str | None] = mapped_column(Text)   # motion/scene prompt sent to provider
+    image_prompt: Mapped[str | None] = mapped_column(Text)  # text-to-image prompt (first frame)
+
+    status: Mapped[VideoStatus] = mapped_column(
+        Enum(VideoStatus), default=VideoStatus.pending, nullable=False, index=True
+    )
+    provider_job_id: Mapped[str | None] = mapped_column(String(128))
+    video_url: Mapped[str | None] = mapped_column(String(2048))
+    error: Mapped[str | None] = mapped_column(Text)
+    duration_seconds: Mapped[int | None] = mapped_column(Integer)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=_utcnow, server_default=func.now(), nullable=False
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime)
+
+    script: Mapped["Script"] = relationship("Script", back_populates="videos")
 
 
 # ---------------------------------------------------------------------------

@@ -56,6 +56,14 @@ class Settings:
     LOG_LEVEL: str
     DISCOVERY_INTERVAL_HOURS: float
 
+    # Phase 3 — video generation
+    RUNWAY_API_KEY: str        # only required when OFFLINE_MODE is false
+    OFFLINE_MODE: bool         # true = stub provider (free); false = real RunwayML
+    VIDEO_MODEL: str
+    VIDEO_IMAGE_MODEL: str
+    VIDEO_RATIO: str
+    VIDEO_DURATION: int
+
     @classmethod
     def load(cls) -> "Settings":
         """Build Settings, raising ConfigError if any required key is missing."""
@@ -66,6 +74,12 @@ class Settings:
             ANTHROPIC_MODEL=_optional("ANTHROPIC_MODEL", "claude-sonnet-4-6"),
             LOG_LEVEL=_optional("LOG_LEVEL", "INFO"),
             DISCOVERY_INTERVAL_HOURS=float(_optional("DISCOVERY_INTERVAL_HOURS", "4")),
+            RUNWAY_API_KEY=_optional("RUNWAY_API_KEY"),
+            OFFLINE_MODE=_optional("OFFLINE_MODE", "true").lower() in ("1", "true", "yes"),
+            VIDEO_MODEL=_optional("VIDEO_MODEL", "gen4.5"),
+            VIDEO_IMAGE_MODEL=_optional("VIDEO_IMAGE_MODEL", "gen4_image"),
+            VIDEO_RATIO=_optional("VIDEO_RATIO", "1280:720"),
+            VIDEO_DURATION=int(_optional("VIDEO_DURATION", "5")),
         )
 
 
