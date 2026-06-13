@@ -278,6 +278,51 @@ class Post(Base):
 
 
 # ---------------------------------------------------------------------------
+# PerformanceSnapshot + CategoryStat — feedback loop (Phase 7)
+# ---------------------------------------------------------------------------
+
+
+class PerformanceSnapshot(Base):
+    """A point-in-time metrics reading for a posted video.
+
+    Append-only: one row per (post, capture). Lets us track growth over time.
+    """
+
+    __tablename__ = "performance_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    post_id: Mapped[int] = mapped_column(
+        ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    views: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    likes: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    comments: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    captured_at: Mapped[datetime] = mapped_column(
+        DateTime, default=_utcnow, server_default=func.now(), nullable=False, index=True
+    )
+
+
+class CategoryStat(Base):
+    """Aggregated performance per trend category — the pipeline's learned memory.
+
+    Recomputed by the feedback aggregator from the latest snapshot of each posted
+    video. The trend classifier reads this to weight future scoring.
+    """
+
+    __tablename__ = "category_stats"
+
+    category: Mapped[str] = mapped_column(String(128), primary_key=True)
+    n_videos: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    total_views: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    total_engagement: Mapped[int] = mapped_column(Integer, default=0, nullable=False)  # likes+comm
+    avg_views: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    avg_engagement: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=_utcnow, server_default=func.now(), onupdate=_utcnow, nullable=False
+    )
+
+
+# ---------------------------------------------------------------------------
 # PipelineLog — structured logging sink
 # ---------------------------------------------------------------------------
 

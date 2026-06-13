@@ -19,6 +19,7 @@ from config import get_settings
 from db.init import init_db
 from db.logging import get_logger
 from discovery import run_cycle
+from feedback.runner import run as run_feedback
 from generation.runner import run as run_script_generation
 from posting.runner import run as run_posting
 from qa.runner import run as run_qa
@@ -89,6 +90,18 @@ def build_scheduler() -> BlockingScheduler:
         max_instances=1,
         coalesce=True,
         next_run_time=now + timedelta(minutes=20),
+    )
+    # Phase 7: collect analytics + recompute category performance, so later
+    # discovery cycles score with learned data. Runs a bit less often.
+    scheduler.add_job(
+        run_feedback,
+        trigger="interval",
+        hours=settings.FEEDBACK_INTERVAL_HOURS,
+        id="feedback_loop",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        next_run_time=now + timedelta(minutes=30),
     )
     return scheduler
 

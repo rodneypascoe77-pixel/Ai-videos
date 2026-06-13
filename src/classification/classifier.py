@@ -98,20 +98,29 @@ class TrendClassifier:
             )
         return "\n".join(lines)
 
+    def _performance_hint(self) -> str:
+        """Learned category-performance context (empty on cold start)."""
+        try:
+            from feedback.aggregator import category_hints
+
+            return category_hints()
+        except Exception:
+            return ""
+
     def _call_model(self, evidence: str, count: int) -> ClassificationResult:
+        hint = self._performance_hint()
+        prompt = (
+            f"Here are {count} raw trend items. Deduplicate, classify, and "
+            f"score them:\n\n{evidence}"
+        )
+        if hint:
+            prompt += f"\n\n{hint}"
+
         response = self.client.messages.parse(
             model=self.model,
             max_tokens=4096,
             system=_SYSTEM_PROMPT,
-            messages=[
-                {
-                    "role": "user",
-                    "content": (
-                        f"Here are {count} raw trend items. Deduplicate, classify, and "
-                        f"score them:\n\n{evidence}"
-                    ),
-                }
-            ],
+            messages=[{"role": "user", "content": prompt}],
             output_format=ClassificationResult,
         )
         return response.parsed_output

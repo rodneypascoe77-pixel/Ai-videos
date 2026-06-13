@@ -70,6 +70,9 @@ class Settings:
     YOUTUBE_CLIENT_SECRETS: str    # path to OAuth client_secret.json
     YOUTUBE_TOKEN_FILE: str        # path to saved OAuth token
 
+    # Phase 7 — feedback loop
+    FEEDBACK_INTERVAL_HOURS: float
+
     @classmethod
     def load(cls) -> "Settings":
         """Build Settings, raising ConfigError if any required key is missing."""
@@ -94,6 +97,7 @@ class Settings:
             YOUTUBE_TOKEN_FILE=_optional(
                 "YOUTUBE_TOKEN_FILE", str(PROJECT_ROOT / "secrets" / "youtube_token.json")
             ),
+            FEEDBACK_INTERVAL_HOURS=float(_optional("FEEDBACK_INTERVAL_HOURS", "12")),
         )
 
 

@@ -7,6 +7,7 @@ from typing import Any
 from sqlalchemy import func
 
 from db.models import (
+    CategoryStat,
     LogLevel,
     PipelineLog,
     Post,
@@ -132,6 +133,25 @@ def list_posts(limit: int = 100) -> list[dict[str, Any]]:
                 "error": p.error,
             }
             for p in rows
+        ]
+
+
+def list_category_stats() -> list[dict[str, Any]]:
+    with session_scope() as session:
+        rows = (
+            session.query(CategoryStat)
+            .order_by(CategoryStat.avg_views.desc())
+            .all()
+        )
+        return [
+            {
+                "category": c.category,
+                "n_videos": c.n_videos,
+                "avg_views": c.avg_views,
+                "avg_engagement": c.avg_engagement,
+                "total_views": c.total_views,
+            }
+            for c in rows
         ]
 
 

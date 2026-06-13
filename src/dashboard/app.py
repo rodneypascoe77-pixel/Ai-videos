@@ -62,6 +62,7 @@ _NAV = """
   <a href="/trends">Trends</a>
   <a href="/videos">Videos</a>
   <a href="/posts">Posts</a>
+  <a href="/performance">Performance</a>
   <a href="/logs">Logs</a>
 </header>
 """
@@ -233,6 +234,30 @@ def logs(level: str | None = None) -> str:
         f"<table><tr><th>Time</th><th>Module</th><th>Message</th></tr>{body_rows}</table>"
     )
     return _page("Logs", body)
+
+
+@app.get("/performance", response_class=HTMLResponse)
+def performance() -> str:
+    rows = queries.list_category_stats()
+    body_rows = "".join(
+        f"<tr><td>{_esc(c['category'])}</td>"
+        f"<td>{c['n_videos']}</td>"
+        f"<td>{_score(c['avg_views'])}</td>"
+        f"<td>{_score(c['avg_engagement'])}</td>"
+        f"<td>{_esc(c['total_views'])}</td></tr>"
+        for c in rows
+    ) or (
+        "<tr><td colspan=5 class='muted'>No performance data yet — "
+        "run the feedback loop after posting.</td></tr>"
+    )
+    body = (
+        "<h1>Category Performance <span class='tag'>learned</span></h1>"
+        "<p class='muted'>Aggregated from posted-video analytics. The trend "
+        "classifier reads this to favor categories that actually perform.</p>"
+        "<table><tr><th>Category</th><th>Videos</th><th>Avg views</th>"
+        f"<th>Avg engagement</th><th>Total views</th></tr>{body_rows}</table>"
+    )
+    return _page("Performance", body)
 
 
 @app.get("/api/stats")
