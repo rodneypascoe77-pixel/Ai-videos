@@ -109,8 +109,8 @@ class Trend(Base):
 
     # Scores (0-100). overall_score is a weighted combination of the others.
     momentum_score: Mapped[float | None] = mapped_column(Float)     # how fast it's rising
-    saturation_score: Mapped[float | None] = mapped_column(Float)   # how crowded/overdone (high = bad)
-    fit_score: Mapped[float | None] = mapped_column(Float)          # fit for our comedic AI-video format
+    saturation_score: Mapped[float | None] = mapped_column(Float)   # how overdone (high=bad)
+    fit_score: Mapped[float | None] = mapped_column(Float)          # fit for our comedic format
     overall_score: Mapped[float | None] = mapped_column(Float)
 
     status: Mapped[TrendStatus] = mapped_column(
