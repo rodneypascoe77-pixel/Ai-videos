@@ -12,6 +12,8 @@ def _temp_db(tmp_path, monkeypatch):
     monkeypatch.setenv("YOUTUBE_API_KEY", "test-key")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{db_file}")
+    # Hermetic: tests must never hit live providers based on the developer's .env.
+    monkeypatch.setenv("OFFLINE_MODE", "true")
 
     # Reset cached engine/session so the new DATABASE_URL takes effect.
     import db.session as session_mod

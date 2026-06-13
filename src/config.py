@@ -63,6 +63,10 @@ class Settings:
     VIDEO_IMAGE_MODEL: str
     VIDEO_RATIO: str
     VIDEO_DURATION: int
+    # Cost controls (Lean profile)
+    VIDEO_MIN_TREND_SCORE: float   # only make videos for trends scoring >= this
+    VIDEO_SCRIPTS_PER_TREND: int   # how many top-ranked scripts get a video
+    VIDEO_MAX_BACKLOG: int         # skip generation if this many unposted videos already exist
 
     # Phase 5 — YouTube posting
     POST_INTERVAL_HOURS: float
@@ -89,6 +93,9 @@ class Settings:
             VIDEO_IMAGE_MODEL=_optional("VIDEO_IMAGE_MODEL", "gen4_image"),
             VIDEO_RATIO=_optional("VIDEO_RATIO", "1280:720"),
             VIDEO_DURATION=int(_optional("VIDEO_DURATION", "5")),
+            VIDEO_MIN_TREND_SCORE=float(_optional("VIDEO_MIN_TREND_SCORE", "70")),
+            VIDEO_SCRIPTS_PER_TREND=int(_optional("VIDEO_SCRIPTS_PER_TREND", "1")),
+            VIDEO_MAX_BACKLOG=int(_optional("VIDEO_MAX_BACKLOG", "3")),
             POST_INTERVAL_HOURS=float(_optional("POST_INTERVAL_HOURS", "8")),
             YOUTUBE_PRIVACY=_optional("YOUTUBE_PRIVACY", "private"),
             YOUTUBE_CLIENT_SECRETS=_optional(
