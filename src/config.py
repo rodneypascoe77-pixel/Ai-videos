@@ -77,6 +77,11 @@ class Settings:
     # Phase 7 — feedback loop
     FEEDBACK_INTERVAL_HOURS: float
 
+    # Faceless long-form (Path B)
+    LONGFORM_NICHE: str
+    LONGFORM_VOICE: str        # an edge-tts voice id
+    LONGFORM_SEGMENTS: int     # number of narration segments per video
+
     @classmethod
     def load(cls) -> "Settings":
         """Build Settings, raising ConfigError if any required key is missing."""
@@ -105,6 +110,11 @@ class Settings:
                 "YOUTUBE_TOKEN_FILE", str(PROJECT_ROOT / "secrets" / "youtube_token.json")
             ),
             FEEDBACK_INTERVAL_HOURS=float(_optional("FEEDBACK_INTERVAL_HOURS", "12")),
+            LONGFORM_NICHE=_optional(
+                "LONGFORM_NICHE", "fascinating science and space facts"
+            ),
+            LONGFORM_VOICE=_optional("LONGFORM_VOICE", "en-US-GuyNeural"),
+            LONGFORM_SEGMENTS=int(_optional("LONGFORM_SEGMENTS", "6")),
         )
 
 

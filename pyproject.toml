@@ -18,6 +18,10 @@ dependencies = [
     "google-auth-httplib2>=0.2.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
+    "edge-tts>=6.1.0",
+    "moviepy>=1.0.3",
+    "imageio-ffmpeg>=0.4.9",
+    "pillow>=10.0.0",
 ]
 
 [project.optional-dependencies]
