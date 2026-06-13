@@ -20,6 +20,7 @@ from db.init import init_db
 from db.logging import get_logger
 from discovery import run_cycle
 from generation.runner import run as run_script_generation
+from qa.runner import run as run_qa
 from video.runner import run as run_video_generation
 
 log = get_logger("scheduler")
@@ -65,6 +66,17 @@ def build_scheduler() -> BlockingScheduler:
         max_instances=1,
         coalesce=True,
         next_run_time=now + timedelta(minutes=10),
+    )
+    # Phase 4: QA the freshly-generated videos. Offset after video generation.
+    scheduler.add_job(
+        run_qa,
+        trigger="interval",
+        hours=interval,
+        id="video_qa",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        next_run_time=now + timedelta(minutes=15),
     )
     return scheduler
 

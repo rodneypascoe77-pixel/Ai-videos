@@ -66,6 +66,8 @@ class VideoStatus(str, enum.Enum):
     generating = "generating"  # submitted, provider job running
     completed = "completed"    # video produced, URL available
     failed = "failed"          # provider job failed
+    qa_passed = "qa_passed"    # passed automated quality checks
+    qa_failed = "qa_failed"    # failed automated quality checks
 
 
 class LogLevel(str, enum.Enum):
@@ -214,8 +216,13 @@ class Video(Base):
     )
     provider_job_id: Mapped[str | None] = mapped_column(String(128))
     video_url: Mapped[str | None] = mapped_column(String(2048))
+    local_path: Mapped[str | None] = mapped_column(String(1024))  # downloaded copy (set by QA)
     error: Mapped[str | None] = mapped_column(Text)
     duration_seconds: Mapped[int | None] = mapped_column(Integer)
+
+    # QA (Phase 4)
+    qa_notes: Mapped[str | None] = mapped_column(Text)        # human-readable check summary
+    qa_checks: Mapped[dict | None] = mapped_column(JSON)      # structured per-check results
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=_utcnow, server_default=func.now(), nullable=False
