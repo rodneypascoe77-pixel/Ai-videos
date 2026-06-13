@@ -12,6 +12,12 @@ class Segment(BaseModel):
     on_screen_text: str = Field(
         description="A short caption/keyword shown on screen for this segment (< 60 chars)."
     )
+    visual_query: str = Field(
+        description=(
+            "1-3 plain visual search words for matching stock footage "
+            "(e.g. 'galaxy stars', 'ocean waves', 'city night'). Concrete nouns only."
+        )
+    )
 
 
 class LongformScript(BaseModel):

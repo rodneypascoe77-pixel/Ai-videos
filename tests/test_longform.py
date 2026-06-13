@@ -33,8 +33,10 @@ def test_script_writer_returns_parsed(monkeypatch):
         description="A short doc.",
         hook="What if a teaspoon weighed a billion tons?",
         segments=[
-            Segment(narration="Neutron stars are incredibly dense.", on_screen_text="Dense"),
-            Segment(narration="They spin hundreds of times a second.", on_screen_text="Fast"),
+            Segment(narration="Neutron stars are incredibly dense.",
+                    on_screen_text="Dense", visual_query="galaxy stars"),
+            Segment(narration="They spin hundreds of times a second.",
+                    on_screen_text="Fast", visual_query="spinning galaxy"),
         ],
     )
     writer = ScriptWriter.__new__(ScriptWriter)
@@ -55,6 +57,35 @@ def test_script_writer_returns_parsed(monkeypatch):
 
 def test_schema_roundtrip():
     s = LongformScript(
-        title="t", description="d", hook="h", segments=[Segment(narration="n", on_screen_text="o")]
+        title="t", description="d", hook="h",
+        segments=[Segment(narration="n", on_screen_text="o", visual_query="q")],
     )
     assert s.segments[0].narration == "n"
+    assert s.segments[0].visual_query == "q"
+
+
+def test_stock_available_reflects_key(monkeypatch):
+    from longform import stock
+
+    monkeypatch.setenv("PEXELS_API_KEY", "")
+    assert stock.available() is False
+    monkeypatch.setenv("PEXELS_API_KEY", "abc123")
+    assert stock.available() is True
+
+
+def test_stock_fetch_returns_none_without_key(monkeypatch, tmp_path):
+    from longform import stock
+
+    monkeypatch.setenv("PEXELS_API_KEY", "")
+    assert stock.fetch_clip("galaxy", tmp_path / "x.mp4") is None
+
+
+def test_thumbnail_is_created(tmp_path):
+    from longform.thumbnail import make_thumbnail
+
+    dest = make_thumbnail("Some Bold Title About Space", tmp_path / "thumb.png")
+    assert dest.exists()
+    from PIL import Image
+
+    img = Image.open(dest)
+    assert img.size == (1280, 720)

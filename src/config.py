@@ -81,6 +81,7 @@ class Settings:
     LONGFORM_NICHE: str
     LONGFORM_VOICE: str        # an edge-tts voice id
     LONGFORM_SEGMENTS: int     # number of narration segments per video
+    PEXELS_API_KEY: str        # free stock-footage key (optional; falls back to slides)
 
     @classmethod
     def load(cls) -> "Settings":
@@ -115,6 +116,7 @@ class Settings:
             ),
             LONGFORM_VOICE=_optional("LONGFORM_VOICE", "en-US-GuyNeural"),
             LONGFORM_SEGMENTS=int(_optional("LONGFORM_SEGMENTS", "6")),
+            PEXELS_API_KEY=_optional("PEXELS_API_KEY"),
         )
 
 
