@@ -1,0 +1,26 @@
+# Secrets
+.env
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Tooling caches
+.ruff_cache/
+.pytest_cache/
+
+# Logs
+logs/
+
+# Local editor/agent settings
+.claude/settings.local.json
