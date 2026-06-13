@@ -47,10 +47,10 @@ def make_one(
     video_path = build_video(script, settings.LONGFORM_VOICE, out_dir)
 
     # Deliverable package
-    first_frame = out_dir / "_work" / "seg_0.mp4"
+    frame = out_dir / "frame.png"
     thumb = make_thumbnail(
         script.title, out_dir / "thumbnail.png",
-        bg_image=first_frame if first_frame.exists() else None,
+        bg_image=frame if frame.exists() else None,
     )
     (out_dir / "title.txt").write_text(script.title, encoding="utf-8")
     (out_dir / "description.txt").write_text(

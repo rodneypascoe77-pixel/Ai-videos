@@ -34,11 +34,14 @@ def _wrap(draw, text, font, max_w):
 
 def make_thumbnail(title: str, dest: Path, bg_image: Path | None = None) -> Path:
     """Bold title card. If bg_image is given, use it darkened behind the text."""
+    img = None
     if bg_image and bg_image.exists():
-        img = Image.open(bg_image).convert("RGB").resize((TW, TH))
-        dark = Image.new("RGB", (TW, TH), (0, 0, 0))
-        img = Image.blend(img, dark, 0.45)
-    else:
+        try:
+            base = Image.open(bg_image).convert("RGB").resize((TW, TH))
+            img = Image.blend(base, Image.new("RGB", (TW, TH), (0, 0, 0)), 0.45)
+        except Exception:
+            img = None
+    if img is None:
         img = Image.new("RGB", (TW, TH), (12, 14, 20))
 
     draw = ImageDraw.Draw(img)

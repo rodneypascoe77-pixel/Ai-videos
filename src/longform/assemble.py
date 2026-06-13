@@ -153,5 +153,10 @@ def build_video(script: LongformScript, voice: str, out_dir: Path, fps: int = 24
     video.write_videofile(
         str(out_path), fps=fps, codec="libx264", audio_codec="aac", logger=None
     )
+    # Save a representative frame for thumbnail backgrounds.
+    try:
+        video.save_frame(str(out_dir / "frame.png"), t=min(2.0, video.duration / 2))
+    except Exception as exc:
+        log.warning("Could not save thumbnail frame", error=str(exc))
     log.info(f"Assembled long-form video: {out_path} ({video.duration:.0f}s)")
     return out_path
