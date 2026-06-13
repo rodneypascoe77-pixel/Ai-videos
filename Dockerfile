@@ -11,5 +11,5 @@ RUN uv sync --no-dev --frozen
 COPY src/ src/
 
 ENV PYTHONPATH=/app/src
-# Phase 1: initialise the DB. A scheduler/run entrypoint lands in a later phase.
-CMD ["uv", "run", "python", "-m", "db.init"]
+# Phase 1: run the 24/7 discovery scheduler (fetch + classify on an interval).
+CMD ["uv", "run", "python", "-m", "scheduler"]

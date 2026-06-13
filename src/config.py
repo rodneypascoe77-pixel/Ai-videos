@@ -54,6 +54,7 @@ class Settings:
     DATABASE_URL: str
     ANTHROPIC_MODEL: str
     LOG_LEVEL: str
+    DISCOVERY_INTERVAL_HOURS: float
 
     @classmethod
     def load(cls) -> "Settings":
@@ -64,6 +65,7 @@ class Settings:
             DATABASE_URL=_optional("DATABASE_URL", f"sqlite:///{DATA_DIR / 'pipeline.db'}"),
             ANTHROPIC_MODEL=_optional("ANTHROPIC_MODEL", "claude-sonnet-4-6"),
             LOG_LEVEL=_optional("LOG_LEVEL", "INFO"),
+            DISCOVERY_INTERVAL_HOURS=float(_optional("DISCOVERY_INTERVAL_HOURS", "4")),
         )
 
 
