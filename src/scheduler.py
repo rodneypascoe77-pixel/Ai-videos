@@ -20,6 +20,7 @@ from db.init import init_db
 from db.logging import get_logger
 from discovery import run_cycle
 from generation.runner import run as run_script_generation
+from posting.runner import run as run_posting
 from qa.runner import run as run_qa
 from video.runner import run as run_video_generation
 
@@ -77,6 +78,17 @@ def build_scheduler() -> BlockingScheduler:
         max_instances=1,
         coalesce=True,
         next_run_time=now + timedelta(minutes=15),
+    )
+    # Phase 5: post one QA-passed video to YouTube, on its own (slower) cadence.
+    scheduler.add_job(
+        run_posting,
+        trigger="interval",
+        hours=settings.POST_INTERVAL_HOURS,
+        id="youtube_posting",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        next_run_time=now + timedelta(minutes=20),
     )
     return scheduler
 

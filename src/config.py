@@ -58,11 +58,17 @@ class Settings:
 
     # Phase 3 — video generation
     RUNWAY_API_KEY: str        # only required when OFFLINE_MODE is false
-    OFFLINE_MODE: bool         # true = stub provider (free); false = real RunwayML
+    OFFLINE_MODE: bool         # true = stub providers (free); false = real APIs
     VIDEO_MODEL: str
     VIDEO_IMAGE_MODEL: str
     VIDEO_RATIO: str
     VIDEO_DURATION: int
+
+    # Phase 5 — YouTube posting
+    POST_INTERVAL_HOURS: float
+    YOUTUBE_PRIVACY: str           # private | unlisted | public
+    YOUTUBE_CLIENT_SECRETS: str    # path to OAuth client_secret.json
+    YOUTUBE_TOKEN_FILE: str        # path to saved OAuth token
 
     @classmethod
     def load(cls) -> "Settings":
@@ -80,6 +86,14 @@ class Settings:
             VIDEO_IMAGE_MODEL=_optional("VIDEO_IMAGE_MODEL", "gen4_image"),
             VIDEO_RATIO=_optional("VIDEO_RATIO", "1280:720"),
             VIDEO_DURATION=int(_optional("VIDEO_DURATION", "5")),
+            POST_INTERVAL_HOURS=float(_optional("POST_INTERVAL_HOURS", "8")),
+            YOUTUBE_PRIVACY=_optional("YOUTUBE_PRIVACY", "private"),
+            YOUTUBE_CLIENT_SECRETS=_optional(
+                "YOUTUBE_CLIENT_SECRETS", str(PROJECT_ROOT / "secrets" / "client_secret.json")
+            ),
+            YOUTUBE_TOKEN_FILE=_optional(
+                "YOUTUBE_TOKEN_FILE", str(PROJECT_ROOT / "secrets" / "youtube_token.json")
+            ),
         )
 
 

@@ -68,6 +68,13 @@ class VideoStatus(str, enum.Enum):
     failed = "failed"          # provider job failed
     qa_passed = "qa_passed"    # passed automated quality checks
     qa_failed = "qa_failed"    # failed automated quality checks
+    posted = "posted"          # uploaded to a platform (see Post)
+
+
+class PostStatus(str, enum.Enum):
+    pending = "pending"  # row created, not yet uploaded
+    posted = "posted"    # uploaded successfully
+    failed = "failed"    # upload failed
 
 
 class LogLevel(str, enum.Enum):
@@ -230,6 +237,44 @@ class Video(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime)
 
     script: Mapped["Script"] = relationship("Script", back_populates="videos")
+    posts: Mapped[list["Post"]] = relationship(
+        "Post", back_populates="video", cascade="all, delete-orphan"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Post — an upload of a Video to a platform (Phase 5)
+# ---------------------------------------------------------------------------
+
+
+class Post(Base):
+    """A publish of a video to a platform (currently YouTube)."""
+
+    __tablename__ = "posts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    video_id: Mapped[int] = mapped_column(
+        ForeignKey("videos.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    platform: Mapped[str] = mapped_column(String(32), default="youtube", nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text)
+    tags: Mapped[list | None] = mapped_column(JSON)
+    privacy: Mapped[str] = mapped_column(String(16), default="private", nullable=False)
+
+    status: Mapped[PostStatus] = mapped_column(
+        Enum(PostStatus), default=PostStatus.pending, nullable=False, index=True
+    )
+    platform_video_id: Mapped[str | None] = mapped_column(String(64))  # the YouTube video id
+    post_url: Mapped[str | None] = mapped_column(String(512))
+    error: Mapped[str | None] = mapped_column(Text)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=_utcnow, server_default=func.now(), nullable=False
+    )
+    posted_at: Mapped[datetime | None] = mapped_column(DateTime)
+
+    video: Mapped["Video"] = relationship("Video", back_populates="posts")
 
 
 # ---------------------------------------------------------------------------
