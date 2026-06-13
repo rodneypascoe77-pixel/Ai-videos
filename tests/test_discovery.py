@@ -58,5 +58,7 @@ def test_scheduler_registers_discovery_job(monkeypatch):
     job = sched.get_job("trend_discovery")
     assert job is not None
     assert job.func is discovery.run_cycle
+    # Phase 2 job is registered too
+    assert sched.get_job("script_generation") is not None
     # Interval reflects the env override
     assert get_settings().DISCOVERY_INTERVAL_HOURS == 6.0

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import signal
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
@@ -19,22 +19,39 @@ from config import get_settings
 from db.init import init_db
 from db.logging import get_logger
 from discovery import run_cycle
+from generation.runner import run as run_script_generation
 
 log = get_logger("scheduler")
 
 
 def build_scheduler() -> BlockingScheduler:
     settings = get_settings()
+    interval = settings.DISCOVERY_INTERVAL_HOURS
     scheduler = BlockingScheduler(timezone="UTC")
+
+    now = datetime.now(timezone.utc)
+    # Phase 1: fetch + classify trends.
     scheduler.add_job(
         run_cycle,
         trigger="interval",
-        hours=settings.DISCOVERY_INTERVAL_HOURS,
+        hours=interval,
         id="trend_discovery",
         replace_existing=True,
         max_instances=1,            # never overlap cycles
         coalesce=True,              # if we fell behind, run once not N times
-        next_run_time=datetime.now(timezone.utc),  # run immediately on startup
+        next_run_time=now,          # run immediately on startup
+    )
+    # Phase 2: generate + select scripts for newly-classified trends. Offset a few
+    # minutes after discovery so the first run has fresh trends to work with.
+    scheduler.add_job(
+        run_script_generation,
+        trigger="interval",
+        hours=interval,
+        id="script_generation",
+        replace_existing=True,
+        max_instances=1,
+        coalesce=True,
+        next_run_time=now + timedelta(minutes=5),
     )
     return scheduler
 
@@ -52,7 +69,10 @@ def main() -> None:
     signal.signal(signal.SIGINT, _shutdown)
     signal.signal(signal.SIGTERM, _shutdown)
 
-    log.info(f"Scheduler starting; trend discovery every {settings.DISCOVERY_INTERVAL_HOURS}h")
+    log.info(
+        "Scheduler starting; discovery + script generation every "
+        f"{settings.DISCOVERY_INTERVAL_HOURS}h"
+    )
     scheduler.start()
 
 

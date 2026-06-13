@@ -19,12 +19,13 @@ from sqlalchemy import (
     DateTime,
     Enum,
     Float,
+    ForeignKey,
     Integer,
     String,
     Text,
     func,
 )
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
@@ -51,6 +52,13 @@ class TrendStatus(str, enum.Enum):
     queued = "queued"    # selected for script/video generation
     used = "used"        # a video was produced from it
     expired = "expired"  # momentum gone / saturated before use
+
+
+class ScriptStatus(str, enum.Enum):
+    generated = "generated"  # one of the N candidates produced for a trend
+    selected = "selected"    # chosen as a best-of-N for video generation
+    rejected = "rejected"    # not selected
+    used = "used"            # a video was produced from it
 
 
 class LogLevel(str, enum.Enum):
@@ -130,6 +138,47 @@ class Trend(Base):
         onupdate=_utcnow,
         nullable=False,
     )
+
+    scripts: Mapped[list["Script"]] = relationship(
+        "Script", back_populates="trend", cascade="all, delete-orphan"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Script — a comedic script candidate generated for a Trend (Phase 2)
+# ---------------------------------------------------------------------------
+
+
+class Script(Base):
+    """One generated comedic script for a trend.
+
+    Phase 2 generates many candidates per trend (status=generated), then selects
+    the best few (status=selected) for video generation in a later phase.
+    """
+
+    __tablename__ = "scripts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    trend_id: Mapped[int] = mapped_column(
+        ForeignKey("trends.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    title: Mapped[str] = mapped_column(String(512), nullable=False)
+    premise: Mapped[str | None] = mapped_column(Text)       # one-line comedic hook
+    script_text: Mapped[str] = mapped_column(Text, nullable=False)  # the actual VO/scene text
+
+    status: Mapped[ScriptStatus] = mapped_column(
+        Enum(ScriptStatus), default=ScriptStatus.generated, nullable=False, index=True
+    )
+    # Selection scoring (populated by the selector for the chosen scripts)
+    quality_score: Mapped[float | None] = mapped_column(Float)   # 0-100
+    selection_reasoning: Mapped[str | None] = mapped_column(Text)
+    selection_rank: Mapped[int | None] = mapped_column(Integer)  # 1 = best
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=_utcnow, server_default=func.now(), nullable=False
+    )
+
+    trend: Mapped["Trend"] = relationship("Trend", back_populates="scripts")
 
 
 # ---------------------------------------------------------------------------
